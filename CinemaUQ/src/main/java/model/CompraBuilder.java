@@ -29,8 +29,11 @@ public class CompraBuilder {
         compra.addConfiteria(confiteria);
         return this;
     }
-//PENDIENTE
+//PEND
     public Compra build() {
+        if (this.compra.getCliente() == null){
+            throw new IllegalStateException("La compra debe tener un cliente asociado");
+        }
         compra.setFechaCompra(LocalDateTime.now());
         return compra;
     }

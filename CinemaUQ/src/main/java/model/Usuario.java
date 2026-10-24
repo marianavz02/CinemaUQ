@@ -13,13 +13,6 @@ public abstract class Usuario {
         this.password = password;
     }
 
-    public void login() {
-        // PENDIENTE
-    }
-
-    public void logout() {
-        // PENDIENTE
-    }
 
     // Getters y Setters
 

@@ -1,4 +1,4 @@
-package org.example.cinemauq;
+package viewController;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

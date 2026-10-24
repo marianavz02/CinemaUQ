@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 public class Sala {
     private int id;
     private int capacidad;

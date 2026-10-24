@@ -16,6 +16,10 @@ public class Compra {
 
 
     protected Compra() {}
+//agregado reciente
+    public Cliente getCliente() {
+        return cliente;
+    }
 
     // Setters (visibilidad paquete o protected)
     void setCliente(Cliente cliente) { this.cliente = cliente; }

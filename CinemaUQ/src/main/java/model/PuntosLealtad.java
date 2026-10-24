@@ -14,6 +14,6 @@ public class PuntosLealtad {
         this.lotes = new ArrayList<>();
     }
 //pendiente
-    public void acumularPuntos(Compra compra) { /* Lógica FIFO */ }
-    public void redimirPuntos(int puntos) { /* Lógica FIFO validando vigencia */ }
+    //public void acumularPuntos(Compra compra) { /* Lógica FIFO */ }
+    //public void redimirPuntos(int puntos) { /* Lógica FIFO validando vigencia */ }
 }
