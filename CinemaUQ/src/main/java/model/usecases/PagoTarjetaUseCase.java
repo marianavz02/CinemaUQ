@@ -1,34 +1,33 @@
 package model.usecases;
 
-import model.Cliente;
-import model.MovimientoTarjeta;
-import java.time.LocalDateTime;
+import model.entity.Cliente;
+import model.exceptions.TarjetaInvalidaException;
 
 public class PagoTarjetaUseCase implements IPagoTarjetaUseCase {
 
     @Override
     public boolean verificarSaldoSuficiente(Cliente cliente, double montoTotal) {
-        // Validar que tarjeta.getSaldo() >= montoTotal y estado sea "Activa"
-        return true;
+        var tarjeta = cliente.getTarjetaVirtual();
+        return tarjeta != null && tarjeta.getSaldo() >= montoTotal && "Activa".equals(tarjeta.getEstado());
     }
 
     @Override
     public void debitarSaldo(Cliente cliente, double montoTotal) throws Exception {
-        if (!verificarSaldoSuficiente(cliente, montoTotal)) {
-            throw new Exception("Saldo insuficiente o tarjeta inactiva");
+        if (cliente.getTarjetaVirtual() == null) {
+            throw new TarjetaInvalidaException("El cliente no tiene una tarjeta virtual asociada.");
         }
 
-        // tarjeta.setSaldo(tarjeta.getSaldo() - montoTotal);
-        registrarMovimiento(cliente, montoTotal, "PAGO");
+        // La entidad TarjetaVirtual ejecuta la validación, la resta y registra el "PAGO"
+        cliente.getTarjetaVirtual().descontar(montoTotal);
     }
 
-    public void recargarTarjeta(Cliente cliente, double monto) {
-        // Únicamente el administrador invoca este flujo
-        // tarjeta.setSaldo(tarjeta.getSaldo() + monto);
-        registrarMovimiento(cliente, monto, "RECARGA");
-    }
+    @Override
+    public void recargarTarjeta(Cliente cliente, double monto) throws Exception {
+        if (cliente.getTarjetaVirtual() == null) {
+            throw new TarjetaInvalidaException("El cliente no tiene una tarjeta virtual asociada.");
+        }
 
-    private void registrarMovimiento(Cliente cliente, double monto, String tipo) {
-        // Crear instancia de MovimientoTarjeta y añadirla a la lista de la tarjeta virtual
+        // La entidad suma el saldo y registra automáticamente la "RECARGA"
+        cliente.getTarjetaVirtual().recargar(monto);
     }
 }

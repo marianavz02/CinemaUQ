@@ -1,4 +1,4 @@
-package model;
+package model.entity;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ public class Combo extends ProductoConfiteria {
     private List<ProductoConfiteria> productos;
     private double descuento;
 
-    protected Combo(int id, String nombre, List<ProductoConfiteria> productos, double descuento) {
+    public Combo(int id, String nombre, List<ProductoConfiteria> productos, double descuento) {
         this.id = id;
         this.nombre = nombre;
         this.productos = productos;

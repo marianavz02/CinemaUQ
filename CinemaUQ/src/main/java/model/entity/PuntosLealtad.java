@@ -1,4 +1,4 @@
-package model;
+package model.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,22 @@ public class PuntosLealtad {
         this.cliente = cliente;
         this.lotes = new ArrayList<>();
     }
-//pendiente
+    //pendiente
     //public void acumularPuntos(Compra compra) { /* Lógica FIFO */ }
     //public void redimirPuntos(int puntos) { /* Lógica FIFO validando vigencia */ }
+
+    public void agregarLote(LotePuntos lote) {
+        if (lote != null) {
+            this.lotes.add(lote);
+            this.totalPuntos += lote.getCantidad();
+        }
+    }
+
+
+    public List<LotePuntos> getLotes() {
+        return lotes;
+    }
+
+
+
 }

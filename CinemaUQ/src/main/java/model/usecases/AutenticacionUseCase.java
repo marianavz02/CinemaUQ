@@ -1,6 +1,6 @@
 package model.usecases;
-import model.Usuario;
 import model.CinemaUQContext;
+import model.entity.Usuario;
 
 public class AutenticacionUseCase implements IAutenticacionUseCase {
     @Override
@@ -9,6 +9,7 @@ public class AutenticacionUseCase implements IAutenticacionUseCase {
         // CinemaUQContext.getInstance().setCurrentUser(usuario);
         return null;
     }
+
 
     @Override
     public void logout(Usuario usuario) {

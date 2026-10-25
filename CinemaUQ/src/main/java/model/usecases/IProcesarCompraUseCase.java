@@ -1,7 +1,7 @@
 package model.usecases;
 
-import model.Cliente;
-import model.Compra;
+import model.entity.Cliente;
+import model.entity.Compra;
 
 public interface IProcesarCompraUseCase {
     Compra ejecutarCompra(Compra compra, Cliente cliente) throws Exception;

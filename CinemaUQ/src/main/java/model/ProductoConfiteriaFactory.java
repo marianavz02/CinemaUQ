@@ -1,5 +1,10 @@
 package model;
 
+import model.entity.Boleta;
+import model.entity.Combo;
+import model.entity.ProductoConfiteria;
+import model.entity.ProductoIndividual;
+
 import java.util.List;
 
 public class ProductoConfiteriaFactory {

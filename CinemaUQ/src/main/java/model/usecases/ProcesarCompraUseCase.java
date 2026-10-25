@@ -1,31 +1,47 @@
 package model.usecases;
 
-import model.Cliente;
-import model.Compra;
+import model.entity.Cliente;
+import model.entity.Compra;
+import model.entity.Boleta;
+import model.entity.DetalleConfiteria;
 
 public class ProcesarCompraUseCase implements IProcesarCompraUseCase {
     private final IPagoTarjetaUseCase pagoServicio;
+    private final IGestionPuntosUseCase puntosServicio;
 
-    //inyeccion de dependencias DIP
-    public ProcesarCompraUseCase(IPagoTarjetaUseCase pagoServicio) {
+    // Inyección de dependencias (DIP)
+    public ProcesarCompraUseCase(IPagoTarjetaUseCase pagoServicio, IGestionPuntosUseCase puntosServicio) {
         this.pagoServicio = pagoServicio;
+        this.puntosServicio = puntosServicio;
     }
 
     @Override
-    public Compra ejecutarCompra (Compra compra, Cliente cliente) throws Exception {
+    public Compra ejecutarCompra(Compra compra, Cliente cliente) throws Exception {
         double totalCompra = calcularTotal(compra);
-        //vrerificar saldo de la tarjeta
+        compra.setTotal(totalCompra); // REVISAR ;-;
+
         if (!pagoServicio.verificarSaldoSuficiente(cliente, totalCompra)) {
             throw new Exception("Saldo Insuficiente en la tarjeta virtual");
         }
+
         pagoServicio.debitarSaldo(cliente, totalCompra);
-        //agregar el calculo de puntos, pendiente
-        //int puntosAcumulados = calcularPuntos(totalCompra);
+        puntosServicio.acumularPuntos(cliente, compra); // RN-004 ejecutada
+
         return compra;
     }
 
     private double calcularTotal(Compra compra) {
-        //pend
-        return 0.0;
+        double total = 0.0;
+        if (compra.getBoletas() != null) {
+            for (Boleta b : compra.getBoletas()) {
+                total += b.getPrecio();
+            }
+        }
+        if (compra.getConfiteria() != null) {
+            for (DetalleConfiteria d : compra.getConfiteria()) {
+                total += (d.getProducto().getPrecio() * d.getCantidad());
+            }
+        }
+        return total;
     }
 }

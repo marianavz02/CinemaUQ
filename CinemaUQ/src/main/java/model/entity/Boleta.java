@@ -1,4 +1,4 @@
-package model;
+package model.entity;
 
 public class Boleta {
     private long id;
@@ -36,4 +36,6 @@ public class Boleta {
     public void setPrecio(double precio) {
         this.precio = precio;
     }
+
+
 }

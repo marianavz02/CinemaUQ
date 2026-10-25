@@ -1,4 +1,6 @@
-package model;
+package model.entity;
+
+import java.time.LocalDate;
 
 public class Administrador extends Usuario {
     public Administrador(long id, String name, String email, String password) {
@@ -17,4 +19,6 @@ public class Administrador extends Usuario {
 //    public void recargarTarjetaVirtual(TarjetaVirtual tarjeta, double monto) { /* ... */ }
 //    public void generarReportesOperativos() { /* ... */ }
 //    public void generarReportesVisuales() { /* ... */ }
+
+
 }

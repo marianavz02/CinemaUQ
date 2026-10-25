@@ -1,6 +1,6 @@
-package model;
+package model.entity;
 
-public abstract class Usuario {
+public class Usuario {
     protected long id;
     protected String name;
     protected String email;
@@ -11,6 +11,7 @@ public abstract class Usuario {
         this.name = name;
         this.email = email;
         this.password = password;
+
     }
 
 
@@ -47,4 +48,5 @@ public abstract class Usuario {
     public void setPassword(String password) {
         this.password = password;
     }
+
 }

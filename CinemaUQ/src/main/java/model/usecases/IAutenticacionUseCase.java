@@ -1,6 +1,6 @@
 package model.usecases;
 
-import model.Usuario;
+import model.entity.Usuario;
 
 public interface IAutenticacionUseCase {
     Usuario login(String email, String password) throws Exception;

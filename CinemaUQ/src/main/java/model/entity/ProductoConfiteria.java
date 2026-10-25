@@ -1,6 +1,6 @@
-package model;
+package model.entity;
 
-public abstract class ProductoConfiteria {
+public class ProductoConfiteria {
     protected int id;
     protected String nombre;
     protected double precio;

@@ -1,4 +1,4 @@
-package model;
+package model.entity;
 
 public class Pelicula {
     private long id;
@@ -67,3 +67,6 @@ public class Pelicula {
         this.imagenUrl = imagenUrl;
     }
 }
+
+
+

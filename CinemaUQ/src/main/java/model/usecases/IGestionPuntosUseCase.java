@@ -1,7 +1,7 @@
 package model.usecases;
 
-import model.Cliente;
-import model.Compra;
+import model.entity.Cliente;
+import model.entity.Compra;
 
 public interface IGestionPuntosUseCase {
     void acumularPuntos(Cliente cliente,Compra compra) throws Exception;

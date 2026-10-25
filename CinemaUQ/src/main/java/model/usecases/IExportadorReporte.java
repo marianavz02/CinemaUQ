@@ -1,7 +1,7 @@
 package model.usecases;
 
 import java.util.List;
-import model.Compra;
+import model.entity.Compra;
 
 public interface IExportadorReporte {
     void exportar(String titulo, List<Compra> datos) throws Exception;

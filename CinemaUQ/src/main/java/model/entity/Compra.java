@@ -1,4 +1,4 @@
-package model;
+package model.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,6 +26,22 @@ public class Compra {
     void setFuncion(Funcion funcion) { this.funcion = funcion; }
     void addBoletas(List<Boleta> boletas) { this.boletas.addAll(boletas); }
     void addConfiteria(List<DetalleConfiteria> confiteria) { this.confiteria.addAll(confiteria); }
-    void setTotal(double total) { this.total = total; }
+    public void setTotal(double total) { this.total = total; }
     void setFechaCompra(LocalDateTime fecha) { this.fechaCompra = fecha; }
+
+    public List<Boleta> getBoletas() {
+        return boletas;
+    }
+
+    public List<DetalleConfiteria> getConfiteria() {
+        return confiteria;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public Long getId() {
+        return id;
+    }
 }
