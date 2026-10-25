@@ -7,6 +7,7 @@ import model.CinemaUQContext;
 import model.ProductoConfiteriaFactory;
 import model.entity.*;
 import model.facade.SistemaCompraFacade;
+import model.usecases.AutenticacionUseCase;
 import model.usecases.PagoTarjetaUseCase;
 import model.usecases.ProcesarCompraUseCase;
 import model.usecases.GestionPuntosUseCase;
@@ -87,8 +88,6 @@ public class MainController {
         for (int f = 1; f <= 3; f++) {
             for (int c = 1; c <= 4; c++) {
                 Asiento a = new Asiento();
-                // Asignar ID y coordenadas usando los campos de la entidad
-                // (Nota: Si tu clase Asiento requiere setters para fila/columna, asegúrate de tenerlos o inicializarlos)
                 asientosSala1.add(a);
             }
         }
@@ -108,6 +107,12 @@ public class MainController {
         prodsBase.add(ProductoConfiteriaFactory.createProductoIndividual(2, "Crispetas de Sal", 12000.0, "Snack"));
 
         listaProductos.getItems().addAll(prodsBase);
+
+
+        // DATO QUEMADO PARA PROBAR Instancia cliente con tarjeta virtual inicializada con saldo de prueba
+        Cliente clientePrueba = new Cliente(101, "Carlos Andrés", "m@", "123");
+        clientePrueba.getTarjetaVirtual().recargar(60000.0); // 60.000 COP iniciales
+        CinemaUQContext.getInstance().agreagarUsuario(clientePrueba);
     }
 
     @FXML
@@ -120,18 +125,25 @@ public class MainController {
             return;
         }
 
-        // Instanciar cliente con tarjeta virtual inicializada con saldo de prueba
-        clienteActual = new Cliente(101, "Carlos Andrés", email, password);
-        clienteActual.getTarjetaVirtual().recargar(60000.0); // 60.000 COP iniciales
+        try {
+            AutenticacionUseCase authUseCase = new AutenticacionUseCase();
 
-        CinemaUQContext.getInstance().setCurrentUser(clienteActual);
-        lblEstadoSesion.setText("Sesión Activa: " + clienteActual.getName() + " | Saldo: $" + clienteActual.getTarjetaVirtual().getSaldo());
-        lblLoginError.setText("");
+            // Se hace un casting ya que login retorna un Usuario genérico
+            clienteActual = (Cliente) authUseCase.login(email, password);
 
-        // Habilitar pestañas del sistema
-        tabCartelera.setDisable(false);
-        tabTarjeta.setDisable(false);
-        mainTabPane.getSelectionModel().select(tabCartelera);
+            CinemaUQContext.getInstance().setCurrentUser(clienteActual);
+            lblEstadoSesion.setText("Sesión Activa: " + clienteActual.getName() + " | Saldo: $" + clienteActual.getTarjetaVirtual().getSaldo());
+            lblLoginError.setText("");
+
+            // Habilitar pestañas del sistema
+            tabCartelera.setDisable(false);
+            tabTarjeta.setDisable(false);
+            mainTabPane.getSelectionModel().select(tabCartelera);
+
+        } catch (Exception e) {
+            // Captura la excepción lanzada si el correo/contraseña son incorrectos
+            lblLoginError.setText(e.getMessage());
+        }
     }
 
     @FXML
@@ -159,22 +171,23 @@ public class MainController {
             Button btnAsiento = new Button("Asiento " + asiento.hashCode() % 100);
             btnAsiento.setPrefSize(90, 40);
 
-            // Verificar estado actual del asiento ("Ocupado", "Seleccionado", o "Disponible")
-            String estado = "Disponible";
-            // Nota: Dependiendo de cómo gestione el estado tu entidad Asiento, evaluamos su texto o propiedad
-            updateButtonStyle(btnAsiento, estado);
+            String estadoActual = asiento.getEstado();
+            updateButtonStyle(btnAsiento, estadoActual);
 
             btnAsiento.setOnAction(e -> {
-                if (btnAsiento.getStyle().contains("c0392b")) {
-                    // Ya está ocupado
+
+                if ("Ocupado".equals(asiento.getEstado())) {
                     return;
                 }
+
                 if (asientosSeleccionadosTemp.contains(asiento)) {
                     asientosSeleccionadosTemp.remove(asiento);
-                    updateButtonStyle(btnAsiento, "Disponible");
+                    asiento.liberar(); // Usa tu método existente ("Disponible")
+                    updateButtonStyle(btnAsiento, asiento.getEstado());
                 } else {
                     asientosSeleccionadosTemp.add(asiento);
-                    updateButtonStyle(btnAsiento, "Seleccionado");
+                    asiento.reservar(); // Usa tu método existente ("Seleccionado")
+                    updateButtonStyle(btnAsiento, asiento.getEstado());
                 }
             });
 
@@ -259,13 +272,12 @@ public class MainController {
         try {
             double total = calcularTotalCompra();
 
-            // Construir boletas usando los asientos seleccionados
             List<Boleta> boletas = new ArrayList<>();
             for (Asiento a : asientosSeleccionadosTemp) {
                 boletas.add(new Boleta(System.currentTimeMillis(), a, 18000.0));
             }
 
-            // Uso del patrón Builder para ensamblar la compra de manera limpia
+            // Uso del patrón Builder para ensamblar la compra
             Compra compra = new CompraBuilder()
                     .paraCliente(clienteActual)
                     .deFuncion(funcionSeleccionada)

@@ -13,7 +13,7 @@ public class SistemaCompraFacade {
     }
 
     public Compra confirmarTransaccion(Compra compra, Cliente cliente) throws Exception {
-        // La fachada expone un único método limpio para la vista
+        // La fachada expone un único método para la vista
         // Ocultando las validaciones de saldo, recálculos y persistencia
         Compra compraProcesada = procesarCompraUseCase.ejecutarCompra(compra, cliente);
 

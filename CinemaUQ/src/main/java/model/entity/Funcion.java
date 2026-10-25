@@ -58,4 +58,9 @@ public class Funcion {
     public void setHora(LocalTime hora) {
         this.hora = hora;
     }
+
+    @Override
+    public String toString() {
+        return pelicula.getTitulo() + " | Fecha: " + fecha + " | Hora: " + hora + " | Sala: " + sala.getId();
+    }
 }
