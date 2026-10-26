@@ -7,15 +7,14 @@ import model.CinemaUQContext;
 import model.ProductoConfiteriaFactory;
 import model.entity.*;
 import model.facade.SistemaCompraFacade;
-import model.usecases.AutenticacionUseCase;
-import model.usecases.PagoTarjetaUseCase;
-import model.usecases.ProcesarCompraUseCase;
-import model.usecases.GestionPuntosUseCase;
+import model.usecases.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
+
 
 public class MainController {
 
@@ -45,6 +44,7 @@ public class MainController {
 
     // Confitería
     @FXML private ListView<ProductoConfiteria> listaProductos;
+    @FXML private CheckBox chkExtraQueso;
     @FXML private TextField txtCantidadProducto;
     @FXML private Label lblConfiteriaResumen;
 
@@ -66,19 +66,19 @@ public class MainController {
     private List<DetalleConfiteria> confiteriaSeleccionadaTemp = new ArrayList<>();
 
     private SistemaCompraFacade sistemaCompraFacade;
+    private IPagoTarjetaUseCase pagoUseCase;
 
     @FXML
     public void initialize() {
-        // Inicializar servicios y arquitectura (Facade, UseCases)
-        PagoTarjetaUseCase pagoUseCase = new PagoTarjetaUseCase();
+        IPagoTarjetaUseCase pagoUseCase;
+        pagoUseCase = new PagoTarjetaUseCaseProxy(new PagoTarjetaUseCase());
         GestionPuntosUseCase puntosUseCase = new GestionPuntosUseCase();
+
         ProcesarCompraUseCase procesarCompraUseCase = new ProcesarCompraUseCase(pagoUseCase, puntosUseCase);
         sistemaCompraFacade = new SistemaCompraFacade(procesarCompraUseCase);
 
-        // Cargar datos de prueba (Películas, Salas y Asientos)
         inicializarDatosPrueba();
     }
-
     private void inicializarDatosPrueba() {
         funcionesDisponibles = new ArrayList<>();
 
@@ -101,10 +101,16 @@ public class MainController {
 
         listaFunciones.getItems().addAll(funcionesDisponibles);
 
-        // Cargar productos de confitería usando la Fábrica (Factory Method)
+// Cargar productos de confitería usando la Fábrica (Factory Method)
         List<ProductoConfiteria> prodsBase = new ArrayList<>();
         prodsBase.add(ProductoConfiteriaFactory.createProductoIndividual(1, "Gaseosa Grande", 8000.0, "Bebida"));
         prodsBase.add(ProductoConfiteriaFactory.createProductoIndividual(2, "Crispetas de Sal", 12000.0, "Snack"));
+
+// Uso extendido del Factory: Creación de un Combo con descuento
+        List<ProductoConfiteria> productosCombo = new ArrayList<>();
+        productosCombo.add(ProductoConfiteriaFactory.createProductoIndividual(3, "Gaseosa Mediana", 6000.0, "Bebida"));
+        productosCombo.add(ProductoConfiteriaFactory.createProductoIndividual(4, "Perro Caliente", 10000.0, "Snack"));
+        prodsBase.add(ProductoConfiteriaFactory.createCombo(5, "Combo Pareja", productosCombo, 0.15));
 
         listaProductos.getItems().addAll(prodsBase);
 
@@ -226,13 +232,24 @@ public class MainController {
     protected void onAgregarProductoClick() {
         ProductoConfiteria prod = listaProductos.getSelectionModel().getSelectedItem();
         if (prod == null) return;
+
         try {
             int cant = Integer.parseInt(txtCantidadProducto.getText());
+
+            // APLICACIÓN PATRÓN DECORATOR: Envolver el objeto original para sumar el precio/descripción
+            if (chkExtraQueso.isSelected()) {
+                prod = new model.decorator.AdicionQuesoDecorator(prod);
+            }
+
             DetalleConfiteria detalle = new DetalleConfiteria(System.currentTimeMillis(), prod, cant);
             confiteriaSeleccionadaTemp.add(detalle);
             lblConfiteriaResumen.setText("Productos en el carrito: " + confiteriaSeleccionadaTemp.size());
+
+            // Limpiar para el siguiente producto
+            chkExtraQueso.setSelected(false);
+            txtCantidadProducto.setText("1");
         } catch (NumberFormatException e) {
-            // Manejo de error de cantidad
+            lblConfiteriaResumen.setText("Error: Cantidad inválida");
         }
     }
 
@@ -323,10 +340,18 @@ public class MainController {
     protected void onRecargarClick() {
         try {
             double monto = Double.parseDouble(txtMontoRecarga.getText());
-            clienteActual.getTarjetaVirtual().recargar(monto);
+
+            // 2. Usar el caso de uso (Proxy) en lugar de modificar la entidad directamente
+            pagoUseCase.recargarTarjeta(clienteActual, monto);
+
             lblRecargaStatus.setText("¡Recarga de $" + monto + " exitosa!");
+            lblRecargaStatus.setStyle("-fx-text-fill: #27ae60;");
             lblEstadoSesion.setText("Sesión Activa: " + clienteActual.getName() + " | Saldo: $" + clienteActual.getTarjetaVirtual().getSaldo());
             txtMontoRecarga.clear();
+        } catch (SecurityException e) {
+            // 3. Capturar y mostrar la excepción lanzada por el Proxy
+            lblRecargaStatus.setText(e.getMessage());
+            lblRecargaStatus.setStyle("-fx-text-fill: #c0392b;");
         } catch (Exception e) {
             lblRecargaStatus.setText("Monto inválido.");
         }

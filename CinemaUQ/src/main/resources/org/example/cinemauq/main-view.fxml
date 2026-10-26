@@ -52,7 +52,6 @@
                         <font><Font name="System Bold" size="14.0" /></font>
                     </Label>
                     <Separator maxWidth="400.0" />
-                    <!-- Matriz de botones generada dinámicamente -->
                     <GridPane fx:id="gridAsientos" alignment="CENTER" hgap="10.0" vgap="10.0" />
                     <HBox alignment="CENTER" spacing="20.0">
                         <Label text="🟩 Disponible" style="-fx-text-fill: #27ae60; -fx-font-weight: bold;" />
@@ -74,7 +73,8 @@
                     <ListView fx:id="listaProductos" prefHeight="200.0" />
                     <HBox spacing="10.0" alignment="CENTER_LEFT">
                         <Label text="Cantidad:" />
-                        <TextField fx:id="txtCantidadProducto" text="1" prefWidth="80.0" />
+                        <TextField fx:id="txtCantidadProducto" text="1" prefWidth="60.0" />
+                        <CheckBox fx:id="chkExtraQueso" text="Adición Queso" />
                         <Button text="Añadir al Carrito" onAction="#onAgregarProductoClick" style="-fx-background-color: #8e44ad; -fx-text-fill: white;" />
                     </HBox>
                     <Label fx:id="lblConfiteriaResumen" text="Productos en el carrito: 0" style="-fx-font-weight: bold;" />
